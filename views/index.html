@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>chat</title>
+	<link rel="stylesheet" href="/public/css/bootstrap.css">
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/public/css/style.css">
+	<script src="/public/js/jquery.js"></script>
+	<script src="//cdn.bootcss.com/jquery.pjax/1.9.6/jquery.pjax.js"></script>
+</head>
+<body>
+<div class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <a href="./" class="navbar-brand"><%= name %></a>
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar-main">
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="http://getbootstrap.com/" target="_blank">您已经<%= count%>次访问了</a></li>
+      </ul>
+
+    </div>
+  </div>
+</div>
+<br>
+<br>
+<br>
+<h1><center>我的聊天记录</center></h1>
+<hr>
+<div class="row">
+	<div class="col-lg-2"></div>
+	<div class="col-lg-8 chat">
+		<div class="widget-container scrollable chat chat-page">
+              <div class="widget-content padded">
+                <ul id="list">
+					<% tasks.forEach(function(item){
+						if(item.done){
+							var style="success";
+						}else{
+							var style="info";
+						}
+					%>
+						<li class="current-user">
+                    		<img width="50" height="50" src="/public/img/xyz.jpg">
+		                    <div >
+		                    <%if(!item.done){%>
+					            <a href="javascript:;" class="fa fa-check" onclick="done(this)" done-data="<%= item.id%>" style="float:left"></a>
+							<%}%>
+							    <div class="alert alert-dismissable alert-<%=style%>" style="border-radius: 8px;">
+					                <button type="button" class="close" close-data="<%= item.id%>" onclick="del(this)">×</button>
+					                <p><%= item.message%></p>
+					            </div>
+		                    </div>
+                  		</li>
+					<%})%>
+                </ul>
+              </div>
+				<div class="input-group">
+		      		<input type="text" class="form-control" id="input-message">
+		        	<span class="input-group-btn"><button class="btn btn-info" type="button" id="send">发送</button></span>
+				</div>
+            </div>
+	</div>
+	<div class="col-lg-2"></div>
+
+	<div id="main">
+
+	</div>
+</div>
+</body>
+	<script>
+		$('#send').click(function(){
+			$.ajax({
+				method:"PUT",
+				url:'/tasks',
+				data:{message:$("#input-message").val()},
+				success:function(data){
+					if(data.status==200){
+						add($("#input-message").val(),data.id);
+						$("#input-message").val('')
+					}
+				}
+			})
+		})
+
+		$("#input-message").keypress(function(event){
+			if(event.which == 13) {
+   				$("#send").click();
+       		}
+		})
+
+
+		function del(obj){
+			var close=obj;
+			var id= $(obj).attr('close-data');
+			$.ajax({
+				method: "DELETE",
+				url:'/tasks/'+ id,
+				success:function(data){
+					if (data.status==200){
+				 		$(close).closest(".current-user").remove();
+					}
+				}
+
+			})
+			// $.post(,{},function(data){
+			//
+			// },'json')
+
+		};
+
+		function add(message,id){
+			var tpl='<li class="current-user" style="display:none">\
+                		<img width="50" height="50" src="/public/img/xyz.jpg">\
+	                    <div >\
+	                    	<a href="javascript:;" class="fa fa-check" onclick="done(this)" done-data="'+id+'" style="float:left"></a>\
+						    <div class="alert alert-dismissable alert-info" style="border-radius: 8px;">\
+				                <button type="button" class="close" close-data="'+id+'" onclick="del(this)" >×</button>\
+				                <p>\
+				                 '+message+'</p>\
+				            </div>\
+	                    </div>\
+              		</li>'
+			$('#list').append(tpl);
+			$(".current-user").fadeIn(1000);
+		}
+
+
+		function done(obj){
+			var done =obj;
+			var id =$(done).attr('done-data');
+
+			$.post('/tasks/'+id,{},function(data){
+				if (data.status==200){
+					$(done).next().attr("class","alert alert-dismissable alert-success");
+					$(done).remove();
+				};
+
+			},'json');
+
+
+		}
+
+	</script>
+</html>

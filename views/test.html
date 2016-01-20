@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="todoList">
+<head>
+	<meta charset="UTF-8">
+	<title>chat</title>
+	<link rel="stylesheet" href="../public/css/bootstrap.css">
+	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="../public/css/style.css">
+    <script src="http://apps.bdimg.com/libs/angular.js/1.3.9/angular.min.js"></script>
+	<script src="../public/js/jquery.js"></script>
+</head>
+<body ng-controller="chats">
+<h1><center>聊天会话📱</center></h1>
+<hr>
+<div class="row">
+	<div class="col-lg-2"></div>
+	<div class="col-lg-8 chat">
+		<div class="widget-container scrollable chat chat-page">
+              <div class="widget-content padded">
+                <ul id="list">
+						<li class="current-user" ng-repeat="item in lists">
+                    		<img width="50" height="50" src="../public/img/xyz.jpg">
+		                    <div >
+							    <div class="alert alert-dismissable alert-info" style="border-radius: 8px;">
+					                <button type="button" class="close" ng-click="lists.splice($index,1)">×</button>
+					                <p>{{item.message}}</p>
+					            </div>
+		                    </div>
+                  		</li>
+                </ul>
+              </div>
+				<div class="input-group">
+		      		<input type="text" class="form-control" ng-model="input" id="input-messages">
+		        	<span class="input-group-btn"><button class="btn btn-info" type="button" id="send" ng-click="add()" >发送</button></span>
+				</div>
+            </div>
+	</div>
+	<div class="col-lg-2"></div>
+</div>
+</body>
+<script>
+    angular.module('todoList',[]).controller('chats',function($scope){
+        $scope.input="";
+		$scope.lists=[];
+		$.get('/tasks',{},function(data){
+			$scope.lists=data;
+			$("#send").click();
+		});
+
+        $scope.add=function(){
+            if ($scope.input) {
+                $scope.lists.push({message:$scope.input});
+            }
+            $scope.input='';
+        }
+
+
+    })
+
+    $("#input-messages").keypress(function(event){
+        if(event.which == 13) {
+            $("#send").click();
+        }
+    })
+
+
+
+</script>
+
+</html>
