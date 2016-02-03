@@ -4,7 +4,14 @@ var message = db.table('message') ;
 // graceful
 exports.index=function *(){
 
-	var rows    = yield message.findAll();
+	var rows    = yield message.findAll(
+	{'order': [
+	        ['id', 'ASC']
+    	]
+	}
+
+	);
+
 	var count   = this.session.count||0;
 	this.session.count  =  ++count;
 	var name= this.session.name||'匿名用户';

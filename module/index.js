@@ -16,7 +16,7 @@ var sequelize = new Sequelize(
 );
 
 exports.table=function (moduleName){
-    var module = require('./'+moduleName+'Module').module(sequelize,Sequelize);
+    var module = require('./'+moduleName).module(sequelize,Sequelize);
     return module;
 };
 
